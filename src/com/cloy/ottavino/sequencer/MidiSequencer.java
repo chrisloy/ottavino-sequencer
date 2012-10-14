@@ -4,7 +4,7 @@ import javax.sound.midi.Synthesizer;
 
 import com.cloy.ottavino.Chord;
 import com.cloy.ottavino.Melody;
-import com.cloy.ottavino.MidiInstrument;
+import com.cloy.ottavino.midi.MidiInstrument;
 
 public class MidiSequencer extends Sequencer<MidiInstrument> {
 	

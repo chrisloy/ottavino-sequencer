@@ -2,30 +2,26 @@ package com.cloy.ottavino.sequencer;
 
 import java.util.Arrays;
 
-import javax.sound.midi.MidiChannel;
-import javax.sound.midi.Synthesizer;
-
 import com.cloy.ottavino.Chord;
 import com.cloy.ottavino.Melody;
 import com.cloy.ottavino.Note;
-import com.cloy.ottavino.midi.MidiInstrument;
+import com.cloy.ottavino.tone.ToneInstrument;
 
-public class MidiSequence implements Sequence {
+public class ToneSequence implements Sequence {
 	
-	private final MidiChannel channel;
 	private final Chord[] chords;
+	private final ToneInstrument instrument;
 	
 	private boolean on = false;
 	
-	public MidiSequence(Synthesizer synth, int panPosition, MidiInstrument instrument, Chord...chords) {
-		this.channel = instrument.getMidiChannel(synth);
+	public ToneSequence(int panPosition, ToneInstrument instrument, Chord...chords) {
 		this.chords = chords;
-		this.channel.controlChange(10, panPosition);
+		this.instrument = instrument;
 		System.out.println("Created " + this);
 	}
 	
-	public MidiSequence(Synthesizer synth, int pan, MidiInstrument instrument, Melody melody) {
-		this(synth, pan, instrument, getChords(melody));
+	public ToneSequence(int pan, ToneInstrument instrument, Melody melody) {
+		this(pan, instrument, getChords(melody));
 	}
 	
 	private static Chord[] getChords(Melody melody) {
@@ -40,7 +36,7 @@ public class MidiSequence implements Sequence {
 	public void on(int position) {
 		Chord chord = chords[position % chords.length];
 		if(chord != null && !on) {
-			start(channel, chord);
+			start(chord);
 			on = true;
 		}
 	}
@@ -50,21 +46,21 @@ public class MidiSequence implements Sequence {
 		Chord chord = chords[position % chords.length];
 		Chord nextChord = chords[(position + 1) % chords.length];
 		if(chord != null && !chord.equals(nextChord)) {
-			stop(channel, chord);
+			stop(chord);
 			on = false;
 		}
 	}
 	
-	private void start(MidiChannel channel, Chord chord) {
+	private void start(Chord chord) {
 		for(Note note : chord.getNotes())
 			if(note != null)
-				channel.noteOn(note.getNoteNumber(), note.getVelocity());
+				instrument.start(note.getFrequency());
 	}
 	
-	private void stop(MidiChannel channel, Chord chord) {
+	private void stop(Chord chord) {
 		for(Note note : chord.getNotes())
 			if(note != null)
-				channel.noteOff(note.getNoteNumber(), note.getDecay());
+				instrument.stop(note.getFrequency());
 	}
 	
 	public String toString() {
