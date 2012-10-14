@@ -3,21 +3,17 @@ package com.cloy.ottavino.sequencer;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.sound.midi.Synthesizer;
-
 import com.cloy.ottavino.Chord;
 import com.cloy.ottavino.Instrument;
 import com.cloy.ottavino.Melody;
 
-public class Sequencer {
+public abstract class Sequencer<I extends Instrument> {
 	
-	private final Synthesizer synth;
 	private final long interval;
 	private final List<Sequence> sequences = new ArrayList<Sequence>();
 	
-	public Sequencer(int bpm, Synthesizer synth) {
+	public Sequencer(int bpm) {
 		this.interval = 60000 / bpm;
-		this.synth = synth;
 	}
 	
 	public void play(int beats) {
@@ -47,19 +43,11 @@ public class Sequencer {
 		sequences.add(s);
 	}
 	
-	public void add(Instrument instrument, Chord...chords) {
-		add(new Sequence(synth, 63, instrument, chords));
-	}
+	public abstract void add(I instrument, Chord...chords);
 	
-	public void add(Instrument instrument, Melody melody) {
-		add(new Sequence(synth, 63, instrument, melody));
-	}
+	public abstract void add(I instrument, Melody melody);
 	
-	public void add(Instrument instrument, int pan, Chord...chords) {
-		add(new Sequence(synth, pan, instrument, chords));
-	}
+	public abstract void add(I instrument, int pan, Chord...chords);
 	
-	public void add(Instrument instrument, int pan, Melody melody) {
-		add(new Sequence(synth, pan, instrument, melody));
-	}
+	public abstract void add(I instrument, int pan, Melody melody);
 }
